@@ -73,7 +73,7 @@ XSLT = u'''<?xml version="1.0"?>
 <xsl:stylesheet version="1.0"
     xmlns:diff="http://namespaces.shoobx.com/diff"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
+    >
 
     <xsl:template match="@diff:insert-formatting">
         <xsl:attribute name="class">
@@ -83,12 +83,12 @@ XSLT = u'''<?xml version="1.0"?>
 
 
     <xsl:template match="@diff:delete">
-        <xsl:attribute name="nc:operation">
+        <xsl:attribute name="operation">
 	    <xsl:value-of select="'delete'"/><xsl:apply-templates />
 	    </xsl:attribute>
     </xsl:template>
 
-    <xsl:template match="diff:insert">
+    <xsl:template match="@diff:insert">
         <xsl:apply-templates/>
     </xsl:template>
 
@@ -100,7 +100,7 @@ XSLT = u'''<?xml version="1.0"?>
 
 </xsl:stylesheet>'''
 
-XSLT_TEMPLATE = lxml.etree.fromstring(XSLT1)
+XSLT_TEMPLATE = lxml.etree.fromstring(XSLT)
 
 class SNOFormatter(formatting.XMLFormatter):
     def render(self, result):

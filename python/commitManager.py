@@ -9,6 +9,8 @@ from jsondiff.symbols import *
 from deviceTransaction import device_push
 from xmldiff import formatting, main
 from SNOFormatter import SNOFormatter
+from lxml import etree
+import xmltodict
 
 
 class parseConfig:
@@ -38,6 +40,16 @@ def parseConfig(config_dict):
                     if newkey == 'insert':
                         config_dict[key] = newvalue[1]
 
+def xml_remove_namespaces(xml_string):
+    root = etree.fromstring(xml_string)
+
+    # Remove namespace prefixes
+    for elem in root.getiterator():
+        elem.tag = etree.QName(elem).localname
+    # Remove unused namespace declarations
+    etree.cleanup_namespaces(root)
+
+    return (etree.tostring(root).decode())
 
 def commit(originalsnoRoot,snoRoot):
     #with open("ConfigDB", "r") as f:
@@ -49,20 +61,33 @@ def commit(originalsnoRoot,snoRoot):
     sno_dict = json.loads(pybindJSON.dumps(snoRoot))
     originalsno_dict = json.loads(pybindJSON.dumps(originalsnoRoot))
     difference = diff(originalsno_dict, sno_dict)
-    print ((originalsnoRoot.get()))
+    print (difference)
+    #print ((originalsnoRoot.get()))
     if 'devices' in difference.keys() and 'device' in difference['devices'].keys():
         for device in difference['devices']['device'].keys():
             if 'config' in difference['devices']['device'][device]:
                 config_dict = difference['devices']['device'][device]['config']
                 #print ((originalsnoRoot.devices.device[device].config.get()))
                 print (device)
-                print (config_dict)
+                #print (config_dict)
+
+
                 original_config = (pybindIETFXMLEncoder.serialise(originalsnoRoot.devices.device[device].config))
                 new_config = (pybindIETFXMLEncoder.serialise(snoRoot.devices.device[device].config))
-                print (original_config)
+                
+                original_config = xml_remove_namespaces(original_config)
+                print (original_config + "\n")
+                
+                new_config = xml_remove_namespaces(new_config)
                 print (new_config)
+
                 print (main.diff_texts(original_config, new_config))
-                print (main.diff_texts(original_config, new_config, formatter=formatter, diff_options={'F': 1.0}))
+                #print (main.diff_texts(original_config, new_config, formatter=formatter))
+                diff_xml = (main.diff_texts(original_config, new_config, formatter=formatter, diff_options={'F': 0.5}))
+                diff_xml = xml_remove_namespaces(diff_xml)
+                print (diff_xml)
+                diff_object = pybindIETFXMLDecoder.decode(diff_xml, snoRoot.devices.device[device], 'config')
+                print (diff_object)
 
 
     
@@ -74,22 +99,23 @@ if __name__ == "__main__":
     test_root = sno()
     rt = test_root.devices.device.add('TEST')
     rt.mgmt_ip = "10.10.10.10"
-    #rt.config.commands.cmd.append('net add swp1 access vlan 20')
-    #rt.config.commands.cmd.append('net add swp1 access vlan 30')
-    #rt.config.commands.cmd.append('net add swp1 access vlan 40')
-    rt.config.commands.cmd.append('test1')
-    rt.config.commands.cmd.append('test2')
-    rt.config.commands.cmd.append('test3')
+    rt.config.commands.cmd.append('net add swp1 access vlan 20')
+    rt.config.commands.cmd.append('net add swp1 access vlan 30')
+    rt.config.commands.cmd.append('net add swp1 access vlan 40')
+    #rt.config.commands.cmd.append('test1')
+    #rt.config.commands.cmd.append('test2')
+    #rt.config.commands.cmd.append('test3')
     test_root.devices.device.add('TEST4')
 
     other_root = sno()
     new_rt = other_root.devices.device.add('TEST')
     new_rt.mgmt_ip = "10.10.10.10"
-    #new_rt.config.commands.cmd.append('net add swp1 access vlan 20')
-    #new_rt.config.commands.cmd.append('net add swp1 access vlan 10')
-    new_rt.config.commands.cmd.append('test1')
-    new_rt.config.commands.cmd.append('test4')
+    new_rt.config.commands.cmd.append('net add swp1 access vlan 20')
+    new_rt.config.commands.cmd.append('net add swp1 access vlan 10')
+    #new_rt.config.commands.cmd.append('test1')
+    #new_rt.config.commands.cmd.append('test4')
     new_rt.config.commands.cmd.append('adfdf')
+    #new_rt.config.commands.cmd.append('test2')
     new_rt = other_root.devices.device.add('TEST2')
     new_rt.mgmt_ip = "10.10.10.11"
     new_rt.config.commands.cmd.append('net add swp1 access vlan 10')
