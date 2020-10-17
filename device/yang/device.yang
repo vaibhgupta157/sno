@@ -1,0 +1,73 @@
+submodule device {
+
+    belongs-to sno {
+        prefix sno;
+    }
+
+    import ietf-inet-types { prefix inet; }
+
+    container devices {
+        list device {
+
+            key name;
+
+            leaf name {
+                type string;
+            }
+
+            leaf device_type {
+                type enumeration {
+                    enum "CumulusLinux";
+                }
+            }
+            leaf mgmt_ip {
+                mandatory true;
+                type inet:ip-address;
+            }
+
+            leaf netconf_port {
+                type uint32;
+                default 830;
+            }
+
+            leaf netconf_user {
+                type string;
+                default "admin";
+            }
+
+            leaf netconf_password {
+                type string;
+                default "CumulusLinux!";
+            }
+
+            leaf serial_number {
+                mandatory true;
+                type string;
+            }
+
+            leaf total_interfaces {
+                type uint32;
+            }
+
+            container config {
+
+            }
+
+        }
+        list groups {
+
+            key name;
+
+            leaf name {
+                type string;
+            }
+
+            leaf-list device {
+                type leafref {
+                    path "../../device/name";
+                }
+            }
+        }
+         
+    }
+}

@@ -1,0 +1,15 @@
+module sno {
+    namespace "http://example.com/sno";
+    prefix sno;
+
+    include "device";
+
+
+    container services {
+    }
+
+    container resource-manager {
+
+    }
+
+}
