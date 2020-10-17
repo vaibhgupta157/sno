@@ -30,6 +30,7 @@ class yc_commands_sno__devices_device_config_commands(PybindBase):
   __slots__ = ('_path_helper', '_extmethods', '__cmd',)
 
   _yang_name = 'commands'
+  _yang_namespace = 'http://example.com/sno'
 
   _pybind_generated_by = 'container'
 
@@ -115,6 +116,7 @@ class yc_config_sno__devices_device_config(PybindBase):
   __slots__ = ('_path_helper', '_extmethods', '__commands',)
 
   _yang_name = 'config'
+  _yang_namespace = 'http://example.com/sno'
 
   _pybind_generated_by = 'container'
 
@@ -200,6 +202,7 @@ class yc_device_sno__devices_device(PybindBase):
   __slots__ = ('_path_helper', '_extmethods', '__name','__device_type','__mgmt_ip','__netconf_port','__netconf_user','__netconf_password','__serial_number','__total_interfaces','__config',)
 
   _yang_name = 'device'
+  _yang_namespace = 'http://example.com/sno'
 
   _pybind_generated_by = 'container'
 
@@ -570,6 +573,7 @@ class yc_groups_sno__devices_groups(PybindBase):
   __slots__ = ('_path_helper', '_extmethods', '__name','__device',)
 
   _yang_name = 'groups'
+  _yang_namespace = 'http://example.com/sno'
 
   _pybind_generated_by = 'container'
 
@@ -695,6 +699,7 @@ class yc_devices_sno__devices(PybindBase):
   __slots__ = ('_path_helper', '_extmethods', '__device','__groups',)
 
   _yang_name = 'devices'
+  _yang_namespace = 'http://example.com/sno'
 
   _pybind_generated_by = 'container'
 
@@ -815,6 +820,7 @@ class sno(PybindBase):
   __slots__ = ('_path_helper', '_extmethods', '__devices',)
 
   _yang_name = 'sno'
+  _yang_namespace = 'http://example.com/sno'
 
   _pybind_generated_by = 'container'
 
@@ -900,6 +906,7 @@ class yc_commands_device__devices_device_config_commands(PybindBase):
   __slots__ = ('_path_helper', '_extmethods', '__cmd',)
 
   _yang_name = 'commands'
+  _yang_namespace = 'http://example.com/sno'
 
   _pybind_generated_by = 'container'
 
@@ -985,6 +992,7 @@ class yc_config_device__devices_device_config(PybindBase):
   __slots__ = ('_path_helper', '_extmethods', '__commands',)
 
   _yang_name = 'config'
+  _yang_namespace = 'http://example.com/sno'
 
   _pybind_generated_by = 'container'
 
@@ -1070,6 +1078,7 @@ class yc_device_device__devices_device(PybindBase):
   __slots__ = ('_path_helper', '_extmethods', '__name','__device_type','__mgmt_ip','__netconf_port','__netconf_user','__netconf_password','__serial_number','__total_interfaces','__config',)
 
   _yang_name = 'device'
+  _yang_namespace = 'http://example.com/sno'
 
   _pybind_generated_by = 'container'
 
@@ -1440,6 +1449,7 @@ class yc_groups_device__devices_groups(PybindBase):
   __slots__ = ('_path_helper', '_extmethods', '__name','__device',)
 
   _yang_name = 'groups'
+  _yang_namespace = 'http://example.com/sno'
 
   _pybind_generated_by = 'container'
 
@@ -1565,6 +1575,7 @@ class yc_devices_device__devices(PybindBase):
   __slots__ = ('_path_helper', '_extmethods', '__device','__groups',)
 
   _yang_name = 'devices'
+  _yang_namespace = 'http://example.com/sno'
 
   _pybind_generated_by = 'container'
 
@@ -1685,6 +1696,7 @@ class device(PybindBase):
   __slots__ = ('_path_helper', '_extmethods', '__devices',)
 
   _yang_name = 'device'
+  _yang_namespace = 'http://example.com/sno'
 
   _pybind_generated_by = 'container'
 
@@ -1770,6 +1782,7 @@ class yc_commands_device__devices_device_config_commands(PybindBase):
   __slots__ = ('_path_helper', '_extmethods', '__cmd',)
 
   _yang_name = 'commands'
+  _yang_namespace = 'http://example.com/sno'
 
   _pybind_generated_by = 'container'
 
@@ -1855,6 +1868,7 @@ class yc_config_device__devices_device_config(PybindBase):
   __slots__ = ('_path_helper', '_extmethods', '__commands',)
 
   _yang_name = 'config'
+  _yang_namespace = 'http://example.com/sno'
 
   _pybind_generated_by = 'container'
 
@@ -1940,6 +1954,7 @@ class yc_device_device__devices_device(PybindBase):
   __slots__ = ('_path_helper', '_extmethods', '__name','__device_type','__mgmt_ip','__netconf_port','__netconf_user','__netconf_password','__serial_number','__total_interfaces','__config',)
 
   _yang_name = 'device'
+  _yang_namespace = 'http://example.com/sno'
 
   _pybind_generated_by = 'container'
 
@@ -2310,6 +2325,7 @@ class yc_groups_device__devices_groups(PybindBase):
   __slots__ = ('_path_helper', '_extmethods', '__name','__device',)
 
   _yang_name = 'groups'
+  _yang_namespace = 'http://example.com/sno'
 
   _pybind_generated_by = 'container'
 
@@ -2435,6 +2451,7 @@ class yc_devices_device__devices(PybindBase):
   __slots__ = ('_path_helper', '_extmethods', '__device','__groups',)
 
   _yang_name = 'devices'
+  _yang_namespace = 'http://example.com/sno'
 
   _pybind_generated_by = 'container'
 
@@ -2555,6 +2572,7 @@ class device(PybindBase):
   __slots__ = ('_path_helper', '_extmethods', '__devices',)
 
   _yang_name = 'device'
+  _yang_namespace = 'http://example.com/sno'
 
   _pybind_generated_by = 'container'
 
