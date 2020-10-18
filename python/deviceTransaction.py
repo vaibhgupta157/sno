@@ -1,4 +1,5 @@
 from netconf.client import NetconfSSHSession
+from ncclient import manager
 
 
 
@@ -10,17 +11,17 @@ class Device:
 
     def connect(self):
         host = self.device.mgmt_ip
-        print (host)
         port = self.device.netconf_port
         username = self.device.netconf_user
         password = self.device.netconf_password
         if not self.session:
-            self.session = NetconfSSHSession(host, port, username, password)
+            #self.session = NetconfSSHSession(host, port, username, password)
+            self.session = manager.connect(host=host, port=port, username=username, password=password, hostkey_verify=False, look_for_keys=False)
 
     def get_config(self):
         if not self.session:
             self.connect()
-        return self.session.get_config()
+        return self.session.get_config("running")
     
     def edit_config(self, config):
         if not self.session:

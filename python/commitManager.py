@@ -215,6 +215,9 @@ if __name__ == "__main__":
     other_root = sno()
     new_rt = other_root.devices.device.add('TEST')
     new_rt.mgmt_ip = "192.168.50.134"
+    new_rt.netconf_port = 830
+    new_rt.netconf_user = "admin"
+    new_rt.netconf_password = "CumulusLinux!"
     new_rt.config.commands.cmd.append('net add swp1 access vlan 20')
     new_rt.config.commands.cmd.append('net add swp1 access vlan 10')
     #new_rt.config.commands.cmd.append('test1')
