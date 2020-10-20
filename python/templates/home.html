@@ -8,6 +8,17 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
+
+  <script>
+    $(document).ready(function() {
+    var messages = "{{ get_flashed_messages() }}";
+
+    if (typeof messages != 'undefined' && messages != '[]') {
+        $("#message").modal();
+    };
+    });
+  </script>
+
   <script language="javascript">
     function addRow(tableID, rowLabel) {  
       var table = document.getElementById(tableID);  
@@ -81,6 +92,35 @@ tr:nth-child(even) {
 <div class="container">
   <h2>SNO</h2>
 
+  {% with messages = get_flashed_messages() %}
+            {% if messages %}
+              {% for message in messages %}
+
+              <div id="message" class="modal fade" role="dialog">
+                  <div class="modal-dialog modal-lg">
+              
+                  <!-- Modal content-->
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                      <p>
+                        {% for line in message.splitlines() %}
+                        {{line}}<br/>
+                        {% endfor %}
+                      </p>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                      </div>
+                  </div>
+                  </div>
+                  </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+
   <button type="button" class='btn btn-success pull-right' data-toggle="modal" data-target="#commit">Commit</button>
 
   <div id="commit" class="modal fade" role="dialog">
@@ -108,8 +148,9 @@ tr:nth-child(even) {
     
 
   <ul class="nav nav-tabs">
-    <li class="active"><a data-toggle="tab" href="#home">Home</a></li>
-    <li><a data-toggle="tab" href="#devices">Devices</a></li>
+    <li class="active"><a data-toggle="link" href="{{ url_for('home') }}">Home</a></li>
+    <!-- <li><a data-toggle="tab" href="#devices">Devices</a></li> -->
+    <li><a data-toggle="link" href="{{ url_for('add_device') }}">Devices</a></li>
     <li><a data-toggle="tab" href="#rm">Resource Manager</a></li>
     <li><a data-toggle="tab" href="#services">Services</a></li>
   </ul>

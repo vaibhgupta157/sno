@@ -1,0 +1,25 @@
+module cumulus-nclu {
+  namespace "http://example.com/cumulus-nclu";
+  prefix cumulus;
+
+  import sno {
+      prefix sno;
+  }
+
+  revision 2019-11-11 {
+    description
+      "Initial revision";
+  }
+
+  
+
+  augment "/sno:devices/sno:device/sno:config" {
+      when "/sno:devices/sno:device/sno:device_type='CumulusLinux'";
+      container commands {
+        leaf-list cmd {
+            type string;
+        }
+    }
+  }
+  
+}

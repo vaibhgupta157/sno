@@ -9,6 +9,7 @@ def calculate_diff(left, right, snoObject=sno()):
     left_dict = json.loads(pybindJSON.dumps(left))
     right_dict = json.loads(pybindJSON.dumps(right))
 
+
     right_side_recursion(left_dict, right_dict)
 
     left_after_right_recursion = snoObject
@@ -30,14 +31,19 @@ def right_side_recursion(left_dict, right_dict):
     for key in right_dict.keys():
         if key not in left_dict.keys():
             left_dict[key] = right_dict[key]
+        elif left_dict[key] == right_dict[key]:
+            del left_dict[key]
         elif isinstance(right_dict[key], dict):
             right_side_recursion(left_dict[key], right_dict[key])
         elif isinstance(right_dict[key], list):
             for item in right_dict[key]:
                 if item not in left_dict[key]:
                     left_dict[key].append(item)
+                else:
+                    left_dict[key].remove(item)
         elif left_dict[key] != right_dict[key]:
             left_dict[key] = right_dict[key]
+        
 
 def JSONDiff(left, right):
     #left_side_recursion(left, right)

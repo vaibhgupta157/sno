@@ -1,5 +1,5 @@
 import flask
-from flask import request, jsonify, render_template, redirect, url_for
+from flask import request, jsonify, render_template, redirect, url_for, flash
 #from flask_cors import CORS, cross_origin
 from sno import sno
 import pyangbind.lib.pybindJSON as pybindJSON
@@ -9,8 +9,11 @@ import random
 import json
 import subprocess, os
 import commitManager 
+import jinja2
 
 app = flask.Flask(__name__)
+app.secret_key = "super secret key"
+app.config["DEBUG"] = True
 #cors = CORS(app)
 
 #app.config["DEBUG"] = True
@@ -85,8 +88,10 @@ def login():
         password = request.form['password']
         global users
         if user not in users.keys():
+            flash("User not found. Please try again!!")
             return redirect(url_for('login'))
         elif users[user]['password'] != password:
+            flash("Invalid Username or Password. Please try again!!")
             return redirect(url_for('login'))
         response = redirect(url_for("home"))
 
@@ -96,6 +101,7 @@ def login():
             sessionCookie = "sno" + user + random.randint(1001, 1100)
             count += 1
         if count == 100:
+            flash("Session count limit reached. Please try after sometime!!")
             return redirect(url_for('login'))
         snoDB = ConfigDB.get_session(sessionID=sessionCookie)
         #active_sessions[sessionCookie] = snoDB
@@ -104,36 +110,73 @@ def login():
     else:
         return render_template('login.html')
 
-@app.route('/devices/device', methods=["POST"])
+@app.route('/devices/device', methods=["GET", "POST"])
 def add_device():
-    device_dict = request.form.to_dict()
     session_id = request.cookies.get('SessionCookie')
     snoDB = ConfigDB.active_sessions[session_id]
+    if request.method == 'GET':
+        snoDB_dict = json.loads(pybindJSON.dumps(snoDB.devices.device))
+        jtox_output, jtox_error = subprocess_cmd("pyang -f jtox ../yang/sno.yang ../device/yang/device.yang ../device/yang/*/*")
+        #print ((jtox_output).decode('utf-8'))
+        tree_output = json.loads(jtox_output.decode('utf-8'))
+        snoDB_dict['tree'] = tree_output['tree']
+        print (snoDB_dict)
+        return render_template('getlistdevice.html', snoDB_dict=snoDB_dict)
+
+    device_dict = request.form.to_dict()
+    #session_id = request.cookies.get('SessionCookie')
+    #snoDB = ConfigDB.active_sessions[session_id]
     new_device = snoDB.devices.device.add(device_dict['name'])
     pybindJSONDecoder.load_json(device_dict, None, None, new_device)
     ConfigDB.active_sessions[session_id] = snoDB
-    return redirect(url_for('home'))
+    flash("Device added successfully")
+    return redirect(url_for('add_device'))
 
 
-@app.route('/devices/device/<device>', methods=["POST"])
+@app.route('/devices/device/<device>', methods=["GET", "POST"])
 def edit_device(device):
-    device_dict = request.form.to_dict()
-    correct_nested_dict(device_dict)
     session_id = request.cookies.get('SessionCookie')
     snoDB = ConfigDB.active_sessions[session_id]
-    device = snoDB.devices.device[device]
-    pybindJSONDecoder.load_json(device_dict, None, None, device)
+    deviceObj = snoDB.devices.device[device]
+    if request.method == 'GET':
+        device_dict = json.loads(pybindJSON.dumps(deviceObj))
+        device_type = deviceObj.device_type
+        jtox_cmd_config_yang = "pyang -f jtox ../yang/sno.yang ../device/yang/device.yang ../device/yang/" + str(device_type) + "/cumulus-nclu.yang"
+        jtox_output, jtox_error = subprocess_cmd(jtox_cmd_config_yang)
+        tree_output = json.loads(jtox_output.decode('utf-8'))
+        device_dict['tree'] = tree_output['tree']
+        print (device_dict)
+        return render_template('editDevice.html', device_dict=device_dict)
+        
+
+
+    device_dict = request.form.to_dict()
+    correct_nested_dict(device_dict)
+    if "_method" in device_dict.keys():
+        snoDB.devices.device.delete(device)
+        ConfigDB.active_sessions[session_id] = snoDB
+        flash("Device deleted successfully")
+        return redirect(url_for('add_device'))
+    #session_id = request.cookies.get('SessionCookie')
+    #snoDB = ConfigDB.active_sessions[session_id]
+    #device = snoDB.devices.device[device]
+    pybindJSONDecoder.load_json(device_dict, None, None, deviceObj)
     ConfigDB.active_sessions[session_id] = snoDB
-    return redirect(url_for('home'))
+    flash("Device edited successfully")
+    return redirect(url_for('add_device'))
 
 
 
 @app.route('/home', methods=["GET"])
 def home():
     session_id = request.cookies.get('SessionCookie')
-    snoDB = ConfigDB.active_sessions[session_id]
+    try:
+        snoDB = ConfigDB.active_sessions[session_id]
+    except KeyError as e:
+        flash("Invalid session ID. Please login again!!")
+        return redirect(url_for('login'))
     snoDB_dict = json.loads(pybindJSON.dumps(snoDB))
-    jtox_output, jtox_error = subprocess_cmd("pyang -f jtox ../yang/sno.yang ../device/yang/*")
+    jtox_output, jtox_error = subprocess_cmd("pyang -f jtox ../yang/sno.yang ../device/yang/device.yang ../device/yang/*/*")
     #print ((jtox_output).decode('utf-8'))
     tree_output = json.loads(jtox_output.decode('utf-8'))
     snoDB_dict['tree'] = tree_output['tree']
@@ -147,9 +190,14 @@ def commit():
     snoDB = ConfigDB.active_sessions[session_id]
     if 'DryRun' in input_dict.keys():
         DryRun_response = commitManager.commit(snoDB, session_id, DryRun=input_dict['DryRun'])
-        print (DryRun_response)
+        flash ("Commit Dry Run: \n" + DryRun_response)
     else:
-        committedDB_dict = commitManager.commit(snoDB, session_id)
+        try:
+            committedDB_dict = commitManager.commit(snoDB, session_id)
+        except Exception as e:
+            flash ("Error while doing commit: " + str(e))
+        if 'Error' in committedDB_dict.keys():
+            flash ("Error while doing commit: " + committedDB_dict['Error'])
     return redirect(url_for('home'))
 
 

@@ -226,6 +226,7 @@ def commit(snoRoot, sessionID, DryRun=False):
 
                 rev_XML = "<config>\n" + rev_XML + "</config>"
 
+                device_config[device] = {}
                 device_config[device]['config'] = configXML
                 device_config[device]['rev_config'] = rev_XML
 

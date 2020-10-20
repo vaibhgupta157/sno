@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>device</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+  <script>
+      $(document).ready(function() {
+      var messages = "{{ get_flashed_messages() }}";
+  
+      if (typeof messages != 'undefined' && messages != '[]') {
+          $("#message").modal();
+      };
+      });
+    </script>
+
+
+  <script>
+      $('#editDevice').on('show.bs.modal', function(e) {
+          var button = $(e.relatedTarget);
+          var modal = $(this);
+          modal.find('.modal-content').load(button.data("remote"));
+      });
+      </script>
+    
+    <script>
+      function sendDelete(event){
+          event.preventDefault();
+          xhttp.open("DELETE", this.href, true);
+          xhttp.send();
+      }
+  </script>
+
+  <style>
+    table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #dddddd;
+  }
+  </style>
+  </head>
+
+  <body>
+
+      <div class="container">
+          <h2>SNO</h2>
+
+          {% with messages = get_flashed_messages() %}
+            {% if messages %}
+              {% for message in messages %}
+
+              <div id="message" class="modal fade" role="dialog">
+                  <div class="modal-dialog modal-sm">
+              
+                  <!-- Modal content-->
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            {% for line in message.splitlines() %}
+                            {{line}}<br/>
+                            {% endfor %}
+                          </p>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                      </div>
+                  </div>
+                  </div>
+                  </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+        
+          <button type="button" class='btn btn-success pull-right' data-toggle="modal" data-target="#commit">Commit</button>
+        
+          <div id="commit" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-sm">
+        
+            <!-- Modal content-->
+            <div class="modal-content">
+              <div class="modal-header">
+                <h4 class="modal-title">Commit</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+              </div>
+              <div class="modal-body">
+                  <form action ="{{ url_for('commit') }}" method = "POST">
+                      <input type="checkbox" id="DryRun" name="DryRun">
+                      <label for="DryRun">DryRun</label>
+                      <p><button type="submit" class="btn btn-info btn-sm">Commit</button></p>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            </div>
+            </div>
+
+    <ul class="nav nav-tabs">
+      <li><a data-toggle="link" href="{{ url_for('home') }}">Home</a></li>
+      <!-- <li><a data-toggle="tab" href="#devices">Devices</a></li> -->
+      <li class="active"><a data-toggle="link" href="{{ url_for('add_device') }}">Devices</a></li>
+      <li><a data-toggle="tab" href="#rm">Resource Manager</a></li>
+      <li><a data-toggle="tab" href="#services">Services</a></li>
+    </ul>
+    
+        <!--
+        <div class="tab-content">
+        <div id="devices" class="tab-pane fade"> -->
+        <div id="devices">
+        <h3>Devices</h3>
+        <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#addDevice">Add Device</button>
+        <div class="table-responsive">     
+          <table id="devicelist" class="table table-bordered table-striped mb-0" style="margin-bottom: 0">
+            <thead class="thead-dark">
+              <tr>
+                <th width="10%">name</th>
+                <th>mgmt_ip</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for device, params in snoDB_dict.items() %}
+              {% if device != 'tree' %}
+              <tr>
+                <td width="10%">{{ device }}</td>
+                <td>{{ params.mgmt_ip }}</td>
+                <td><a href="#editDevice" class="nav-link" data-remote="/devices/device/{{device}}" data-toggle="modal" data-target="#editDevice"><button type="button" class="btn btn-info btn-sm" >Edit</button></a></td>
+                <td><form action = "/devices/device/{{device}}" method="POST">
+                  <input type="hidden" name="_method" value="DELETE">
+                  <button type="submit" class="btn btn-info btn-sm">Delete</button>
+                  </form>
+                </td>
+              </tr>
+              {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+          </div>
+      </div>
+
+    <!-- Modal -->
+
+    <div id="addDevice" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+    
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Add device params</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+              <form action ="{{ url_for('add_device') }}" method = "POST">
+                <div class="form-group">
+              {% for param, value in snoDB_dict.tree['sno:devices'][1].device[1].items() %}
+                {% if value[0] == 'leaf' %}
+                  {% if value[1] == 'string' %}
+                  <label for={{param}}>{{param}}:</label>
+                    <input type="text" id={{param}} name={{param}} class="form-control"><br>
+                  {% elif value[1] == 'uint32' %}
+                  <label for={{param}}>{{param}}:</label>
+                    <input type="number" id={{param}} name={{param}} class="form-control"><br>
+                  {% elif value[1] == 'enumeration' %}
+                  <label for={{param}}>{{param}}:</label>
+                    <select name={{param}} id={{param}} class="form-control">
+                    {% for enum in value[2] %}
+                      <option value={{enum}}>{{enum}}</option>
+                    {% endfor %}
+                    </select><br>
+                  {% elif value[1] is iterable %}
+                    {% if value[1][0] == 'union' %}
+                      <label for={{param}}>{{param}}:</label>
+                      <input type="text" id={{param}} name={{param}} class="form-control"><br>
+                    {% endif %}
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+              <p><button type="submit" class="btn btn-info btn-sm">Add Device</button></p>
+                </div>
+              </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>  
+      </div>
+    </div>
+
+
+
+    <div id="editDevice" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+    
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Edit Device</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+        </div>
+    </div>
+
+  
+   </div>
+  </body>
