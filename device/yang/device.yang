@@ -40,14 +40,7 @@ submodule device {
                 default "CumulusLinux!";
             }
 
-            leaf serial_number {
-                mandatory true;
-                type string;
-            }
 
-            leaf total_interfaces {
-                type uint32;
-            }
 
             container config {
 

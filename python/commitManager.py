@@ -14,6 +14,8 @@ from lxml import etree
 import xml.etree.ElementTree as ET
 import xmltodict
 import difflib
+from ConfigDB import ConfigDB
+from JSONDiff import calculate_diff
 
 def XMLDiff(left, right):
     root_left = etree.fromstring(left)
@@ -61,6 +63,9 @@ def right_side_recursion(root_left, root_right):
     #for element in root_right.getchildren():
     for element in root_right.getchildren():
         if not root_left.findall(element.tag):
+            print ("Did not find element tag. so appending")
+            print (element.tag)
+            print (element.text)
             root_left.append(element)
         else:
             all_matches = root_left.findall(element.tag)
@@ -71,6 +76,9 @@ def right_side_recursion(root_left, root_right):
                 if best_match:
                     right_side_recursion(best_match, element)
                 else:
+                    print ("Did not find best match")
+                    print (element.tag)
+                    print (element.text)
                     root_left.append(element)
                     '''
                     for elem in all_matches:
@@ -106,6 +114,7 @@ def compare_element(left_element, right_element, depth=0):
 def find_best_match(all_matches, element):
     best_match = None
     best_depth = 0
+
 
     for match in all_matches:
         depth = 0
@@ -145,26 +154,32 @@ def find_best_match(all_matches, element):
 
 
 
-def commit(originalsnoRoot, snoRoot, DryRun=False):
+def commit(snoRoot, sessionID, DryRun=False):
     #with open("ConfigDB", "r") as f:
     #    originalsno_dict = json.loads(f.read())
 
+    get_lock = ConfigDB.acquire_lock()
+
+    if 'Error' in get_lock.keys():
+        return get_lock
+    else:
+        originalsnoRoot = get_lock['ConfigDB']
   
     if DryRun:
-        print ("Dry run result\n")
+        '''
         original_xml = (pybindIETFXMLEncoder.serialise(originalsnoRoot))
         new_xml = (pybindIETFXMLEncoder.serialise(snoRoot))
         diff_xml = XMLDiff(original_xml, new_xml)
-        print (original_xml)
-        print (new_xml)
-        print (diff_xml)
-        return
+        '''
+
+        diff_xml = calculate_diff(originalsnoRoot, snoRoot)
+        ConfigDB.release_lock()
+        return diff_xml
 
     sno_dict = json.loads(pybindJSON.dumps(snoRoot))
     originalsno_dict = json.loads(pybindJSON.dumps(originalsnoRoot))
     difference = diff(originalsno_dict, sno_dict)
 
-    print (difference)
 
     #print ((originalsnoRoot.get()))
     device_config = {}
@@ -179,50 +194,85 @@ def commit(originalsnoRoot, snoRoot, DryRun=False):
                 if device not in originalsnoRoot.devices.device.keys():
                     return {"Error" : "Device {} not present in DB. First add the device".format(device)}
 
-                original_config = (pybindIETFXMLEncoder.serialise(originalsnoRoot.devices.device[device].config))
-                new_config = (pybindIETFXMLEncoder.serialise(snoRoot.devices.device[device].config))
+                
+                original_config = originalsnoRoot.devices.device[device].config
+                new_config = snoRoot.devices.device[device].config
 
+                '''
+                print (original_config)
+                print (new_config)
                 XMLDiff1 = XMLDiff(original_config, new_config)
 
-                print (XMLDiff1)
+                print (XMLDiff1+"\n")
+                configXML_tree = list( etree.fromstring(XMLDiff1) )[0]
+                configXML = etree.tostring(configXML_tree).decode()
+
+                configXML = "<config>\n" + configXML + "</config>"
+                '''
 
 
-                device_config[device] = XMLDiff1
+                XMLDIFF = calculate_diff(original_config, new_config, snoObject=originalsnoRoot.devices.device[device].config)
+
+                configXML_tree = list(etree.fromstring(XMLDIFF))[0]
+                configXML = etree.tostring(configXML_tree).decode()
+
+                configXML = "<config>\n" + configXML + "</config>"
+                print (configXML)
+
+
+                rev_XMLDIFF = calculate_diff(new_config, original_config, snoObject=originalsnoRoot.devices.device[device].config)
+                rev_XML_tree = list(etree.fromstring(rev_XMLDIFF))[0]
+                rev_XML = etree.tostring(rev_XML_tree).decode()
+
+                rev_XML = "<config>\n" + rev_XML + "</config>"
+
+                device_config[device]['config'] = configXML
+                device_config[device]['rev_config'] = rev_XML
 
 
     if device_config:
-        NetworkTransaction(device_config, originalsnoRoot)
+        try:
+            NetworkTransaction(device_config, originalsnoRoot)
+        except Exception as e:
+            return ({"Error" : "Failed to commit. " + str(e)})
+
     
+    return ({"ConfigDB" : ConfigDB.write(snoRoot, sessionID)})
 
     #originalsnoRoot = sno()
-    pybindJSONDecoder.load_json(originalsno_dict, None, None, originalsnoRoot)
+    #pybindJSONDecoder.load_json(originalsno_dict, None, None, originalsnoRoot)
 
 if __name__ == "__main__":
     test_root = sno()
     rt = test_root.devices.device.add('TEST')
     rt.mgmt_ip = "192.168.50.134"
-    rt.netconf_port = 830
+    rt.netconf_port = 8300
     rt.netconf_user = "admin"
-    rt.netconf_password = "CumulusLinux!"
-    rt.config.commands.cmd.append('net add swp1 access vlan 20')
-    rt.config.commands.cmd.append('net add swp1 access vlan 30')
-    rt.config.commands.cmd.append('net add swp1 access vlan 40')
+    #rt.netconf_password = "CumulusLinux!"
+    rt.netconf_password = "admin"
+    rt.config.commands.cmd.append('net add interface swp1 ip address 10.1.1.1/24')
+    rt.config.commands.cmd.append('net add interface swp2 ip address 10.2.1.1/24')
+    rt.config.commands.cmd.append('net add interface swp3 ip address 10.3.1.1/24')
     #rt.config.commands.cmd.append('test1')
     #rt.config.commands.cmd.append('test2')
     #rt.config.commands.cmd.append('test3')
     test_root.devices.device.add('TEST4')
 
+    test_root_dict = json.loads(pybindJSON.dumps(test_root))
+    with open("../ConfigDB", 'w') as conf:
+        json.dump(test_root_dict, conf)
+
     other_root = sno()
     new_rt = other_root.devices.device.add('TEST')
     new_rt.mgmt_ip = "192.168.50.134"
-    new_rt.netconf_port = 830
+    new_rt.netconf_port = 8300
     new_rt.netconf_user = "admin"
-    new_rt.netconf_password = "CumulusLinux!"
-    new_rt.config.commands.cmd.append('net add swp1 access vlan 20')
-    new_rt.config.commands.cmd.append('net add swp1 access vlan 10')
+    new_rt.netconf_password = "admin"
+    new_rt.config.commands.cmd.append('net add interface swp1 ip address 20.1.1.1/24')
+    new_rt.config.commands.cmd.append('net add interface swp2 ip address 20.2.1.1/24')
     #new_rt.config.commands.cmd.append('test1')
     #new_rt.config.commands.cmd.append('test4')
-    new_rt.config.commands.cmd.append('adfdf')
+    new_rt.config.commands.cmd.append('net add interface swp3 ip address 20.3.1.1/24')
     #new_rt.config.commands.cmd.append('test2')
 
     '''
@@ -235,5 +285,5 @@ if __name__ == "__main__":
     new_rt.config.commands.cmd.append('net add swp1 access vlan 10')
     '''
 
-    commit(test_root, other_root, DryRun=True)
-    print (commit(test_root, other_root))
+    print (commit(other_root, DryRun=True))
+    print (commit(other_root))
