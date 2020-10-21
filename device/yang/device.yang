@@ -18,6 +18,7 @@ submodule device {
             leaf device_type {
                 type enumeration {
                     enum "CumulusLinux";
+                    enum "odl";
                 }
             }
             leaf mgmt_ip {
