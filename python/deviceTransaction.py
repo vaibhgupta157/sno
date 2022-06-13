@@ -1,6 +1,6 @@
 from netconf.client import NetconfSSHSession
 from ncclient import manager
-from rollback import Rollback
+#from rollback import Rollback
 
 
 

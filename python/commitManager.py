@@ -5,8 +5,8 @@ from pyangbind.lib.serialise import pybindJSONEncoder, pybindJSONDecoder
 from pyangbind.lib.serialise import pybindIETFXMLEncoder, pybindIETFXMLDecoder
 import pprint
 import json
-from jsondiff import diff
-from jsondiff.symbols import *
+#from jsondiff import diff
+#from jsondiff.symbols import *
 from deviceTransaction import NetworkTransaction
 #from xmldiff import formatting, main
 #from SNOFormatter import SNOFormatter
