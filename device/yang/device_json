@@ -1,0 +1,78 @@
+{
+	"device": {
+		"yang_type": "submodule",
+		"yang-version": "1.1",
+		"sno": {
+			"yang_type": "belongs-to",
+			"prefix": "sno"
+		},
+		"ietf-yang-schema-mount": {
+			"yang_type": "import",
+			"prefix": "yangmnt"
+		},
+		"ietf-inet-types": {
+			"yang_type": "import",
+			"prefix": "inet"
+		},
+		"devices": {
+			"yang_type": "container",
+			"device": {
+				"yang_type": "list",
+				"key": "name",
+				"name": {
+					"yang_type": "leaf",
+					"type": "string"
+				},
+				"device_type": {
+					"yang_type": "leaf",
+					"type": "enumeration",
+					"enum": ["CumulusLinux", "odl"]
+				},
+				"mgmt_ip": {
+					"yang_type": "leaf",
+					"mandatory": "true",
+					"type": "inet:ip-address"
+				},
+				"netconf_port": {
+					"yang_type": "leaf",
+					"type": "uint32",
+					"default": "830"
+				},
+				"netconf_user": {
+					"yang_type": "leaf",
+					"type": "string",
+					"default": "admin"
+				},
+				"netconf_password": {
+					"yang_type": "leaf",
+					"type": "string",
+					"default": "CumulusLinux!"
+				},
+				"config": {
+					"yang_type": "container",
+					"supported-modules": {
+						"yang_type": "list",
+						"key": "name",
+						"name": {
+							"yang_type": "leaf",
+							"type": "string"
+						}
+					}
+				}
+			},
+			"groups": {
+				"yang_type": "list",
+				"key": "name",
+				"name": {
+					"yang_type": "leaf",
+					"type": "string"
+				},
+				"device": {
+					"yang_type": "leaf-list",
+					"type": "leafref",
+					"path": "../../device/name"
+				}
+			}
+		}
+	}
+}

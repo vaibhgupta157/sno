@@ -1,0 +1,1 @@
+{"cumulus-nclu": {"yang_type": "module", "namespace": "http://example.com/cumulus-nclu", "prefix": "cumulus", "revision": "2019-11-11", "commands": {"yang_type": "container", "cmd": {"yang_type": "leaf-list", "type": "string"}}}}

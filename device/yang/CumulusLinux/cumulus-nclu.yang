@@ -13,13 +13,9 @@ module cumulus-nclu {
 
   
 
-  augment "/sno:devices/sno:device/sno:config" {
-      when "/sno:devices/sno:device/sno:device_type='CumulusLinux'";
-      container commands {
-        leaf-list cmd {
-            type string;
-        }
-    }
+  container commands {
+     leaf-list cmd {
+        type string;
+     }
   }
-  
 }

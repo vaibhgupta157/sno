@@ -1,10 +1,18 @@
 submodule device {
 
+    yang-version 1.1;
+
     belongs-to sno {
         prefix sno;
     }
 
-    import ietf-inet-types { prefix inet; }
+    import ietf-yang-schema-mount {
+        prefix yangmnt;
+    }
+
+    import ietf-inet-types { 
+        prefix inet; 
+    }
 
     container devices {
         list device {
@@ -41,10 +49,10 @@ submodule device {
                 default "CumulusLinux!";
             }
 
-
-
             container config {
-
+                leaf-list supported-modules {
+                    type string;
+                }
             }
 
         }

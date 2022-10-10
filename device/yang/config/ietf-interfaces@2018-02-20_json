@@ -1,0 +1,313 @@
+{
+	"ietf-interfaces": {
+		"yang_type": "module",
+		"yang-version": "1.1",
+		"namespace": "urn:ietf:params:xml:ns:yang:ietf-interfaces",
+		"prefix": "if",
+		"ietf-yang-types": {
+			"yang_type": "import",
+			"prefix": "yang"
+		},
+		"revision": ["2018-02-20", "2014-05-08"],
+		"typedef": ["interface-ref", "interface-state-ref"],
+		"type": ["leafref", "leafref"],
+		"path": ["/if:interfaces/if:interface/if:name", "/if:interfaces-state/if:interface/if:name"],
+		"identity": "interface-type",
+		"feature": ["arbitrary-names", "pre-provisioning", "if-mib"],
+		"interfaces": {
+			"yang_type": "container",
+			"interface": {
+				"yang_type": "list",
+				"key": "name",
+				"name": {
+					"yang_type": "leaf",
+					"type": "string"
+				},
+				"description": {
+					"yang_type": "leaf",
+					"type": "string"
+				},
+				"type": {
+					"yang_type": "leaf",
+					"type": "identityref",
+					"base": "interface-type",
+					"mandatory": "true"
+				},
+				"enabled": {
+					"yang_type": "leaf",
+					"type": "boolean",
+					"default": "true"
+				},
+				"link-up-down-trap-enable": {
+					"yang_type": "leaf",
+					"if-feature": "if-mib",
+					"type": "enumeration",
+					"enum": ["enabled", "disabled"],
+					"value": ["1", "2"]
+				},
+				"admin-status": {
+					"yang_type": "leaf",
+					"if-feature": "if-mib",
+					"type": "enumeration",
+					"enum": ["up", "down", "testing"],
+					"value": ["1", "2", "3"],
+					"config": "false",
+					"mandatory": "true"
+				},
+				"oper-status": {
+					"yang_type": "leaf",
+					"type": "enumeration",
+					"enum": ["up", "down", "testing", "unknown", "dormant", "not-present", "lower-layer-down"],
+					"value": ["1", "2", "3", "4", "5", "6", "7"],
+					"config": "false",
+					"mandatory": "true"
+				},
+				"last-change": {
+					"yang_type": "leaf",
+					"type": "yang:date-and-time",
+					"config": "false"
+				},
+				"if-index": {
+					"yang_type": "leaf",
+					"if-feature": "if-mib",
+					"type": "int32",
+					"range": "1..2147483647",
+					"config": "false",
+					"mandatory": "true"
+				},
+				"phys-address": {
+					"yang_type": "leaf",
+					"type": "yang:phys-address",
+					"config": "false"
+				},
+				"higher-layer-if": {
+					"yang_type": "leaf-list",
+					"type": "interface-ref",
+					"config": "false"
+				},
+				"lower-layer-if": {
+					"yang_type": "leaf-list",
+					"type": "interface-ref",
+					"config": "false"
+				},
+				"speed": {
+					"yang_type": "leaf",
+					"type": "yang:gauge64",
+					"units": "bits/second",
+					"config": "false"
+				},
+				"statistics": {
+					"yang_type": "container",
+					"config": "false",
+					"discontinuity-time": {
+						"yang_type": "leaf",
+						"type": "yang:date-and-time",
+						"mandatory": "true"
+					},
+					"in-octets": {
+						"yang_type": "leaf",
+						"type": "yang:counter64"
+					},
+					"in-unicast-pkts": {
+						"yang_type": "leaf",
+						"type": "yang:counter64"
+					},
+					"in-broadcast-pkts": {
+						"yang_type": "leaf",
+						"type": "yang:counter64"
+					},
+					"in-multicast-pkts": {
+						"yang_type": "leaf",
+						"type": "yang:counter64"
+					},
+					"in-discards": {
+						"yang_type": "leaf",
+						"type": "yang:counter32"
+					},
+					"in-errors": {
+						"yang_type": "leaf",
+						"type": "yang:counter32"
+					},
+					"in-unknown-protos": {
+						"yang_type": "leaf",
+						"type": "yang:counter32"
+					},
+					"out-octets": {
+						"yang_type": "leaf",
+						"type": "yang:counter64"
+					},
+					"out-unicast-pkts": {
+						"yang_type": "leaf",
+						"type": "yang:counter64"
+					},
+					"out-broadcast-pkts": {
+						"yang_type": "leaf",
+						"type": "yang:counter64"
+					},
+					"out-multicast-pkts": {
+						"yang_type": "leaf",
+						"type": "yang:counter64"
+					},
+					"out-discards": {
+						"yang_type": "leaf",
+						"type": "yang:counter32"
+					},
+					"out-errors": {
+						"yang_type": "leaf",
+						"type": "yang:counter32"
+					}
+				}
+			}
+		},
+		"status": "deprecated",
+		"interfaces-state": {
+			"yang_type": "container",
+			"config": "false",
+			"status": "deprecated",
+			"interface": {
+				"yang_type": "list",
+				"key": "name",
+				"status": "deprecated",
+				"name": {
+					"yang_type": "leaf",
+					"type": "string",
+					"status": "deprecated"
+				},
+				"type": {
+					"yang_type": "leaf",
+					"type": "identityref",
+					"base": "interface-type",
+					"mandatory": "true",
+					"status": "deprecated"
+				},
+				"admin-status": {
+					"yang_type": "leaf",
+					"if-feature": "if-mib",
+					"type": "enumeration",
+					"enum": ["up", "down", "testing"],
+					"value": ["1", "2", "3"],
+					"mandatory": "true",
+					"status": "deprecated"
+				},
+				"oper-status": {
+					"yang_type": "leaf",
+					"type": "enumeration",
+					"enum": ["up", "down", "testing", "unknown", "dormant", "not-present", "lower-layer-down"],
+					"value": ["1", "2", "3", "4", "5", "6", "7"],
+					"mandatory": "true",
+					"status": "deprecated"
+				},
+				"last-change": {
+					"yang_type": "leaf",
+					"type": "yang:date-and-time",
+					"status": "deprecated"
+				},
+				"if-index": {
+					"yang_type": "leaf",
+					"if-feature": "if-mib",
+					"type": "int32",
+					"range": "1..2147483647",
+					"mandatory": "true",
+					"status": "deprecated"
+				},
+				"phys-address": {
+					"yang_type": "leaf",
+					"type": "yang:phys-address",
+					"status": "deprecated"
+				},
+				"higher-layer-if": {
+					"yang_type": "leaf-list",
+					"type": "interface-state-ref",
+					"status": "deprecated"
+				},
+				"lower-layer-if": {
+					"yang_type": "leaf-list",
+					"type": "interface-state-ref",
+					"status": "deprecated"
+				},
+				"speed": {
+					"yang_type": "leaf",
+					"type": "yang:gauge64",
+					"units": "bits/second",
+					"status": "deprecated"
+				},
+				"statistics": {
+					"yang_type": "container",
+					"status": "deprecated",
+					"discontinuity-time": {
+						"yang_type": "leaf",
+						"type": "yang:date-and-time",
+						"mandatory": "true",
+						"status": "deprecated"
+					},
+					"in-octets": {
+						"yang_type": "leaf",
+						"type": "yang:counter64",
+						"status": "deprecated"
+					},
+					"in-unicast-pkts": {
+						"yang_type": "leaf",
+						"type": "yang:counter64",
+						"status": "deprecated"
+					},
+					"in-broadcast-pkts": {
+						"yang_type": "leaf",
+						"type": "yang:counter64",
+						"status": "deprecated"
+					},
+					"in-multicast-pkts": {
+						"yang_type": "leaf",
+						"type": "yang:counter64",
+						"status": "deprecated"
+					},
+					"in-discards": {
+						"yang_type": "leaf",
+						"type": "yang:counter32",
+						"status": "deprecated"
+					},
+					"in-errors": {
+						"yang_type": "leaf",
+						"type": "yang:counter32",
+						"status": "deprecated"
+					},
+					"in-unknown-protos": {
+						"yang_type": "leaf",
+						"type": "yang:counter32",
+						"status": "deprecated"
+					},
+					"out-octets": {
+						"yang_type": "leaf",
+						"type": "yang:counter64",
+						"status": "deprecated"
+					},
+					"out-unicast-pkts": {
+						"yang_type": "leaf",
+						"type": "yang:counter64",
+						"status": "deprecated"
+					},
+					"out-broadcast-pkts": {
+						"yang_type": "leaf",
+						"type": "yang:counter64",
+						"status": "deprecated"
+					},
+					"out-multicast-pkts": {
+						"yang_type": "leaf",
+						"type": "yang:counter64",
+						"status": "deprecated"
+					},
+					"out-discards": {
+						"yang_type": "leaf",
+						"type": "yang:counter32",
+						"status": "deprecated"
+					},
+					"out-errors": {
+						"yang_type": "leaf",
+						"type": "yang:counter32",
+						"status": "deprecated"
+					}
+				}
+			}
+		}
+	}
+}
+

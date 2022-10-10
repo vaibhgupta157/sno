@@ -1,0 +1,21 @@
+module test_yang {
+    yang-version 1.1;
+    namespace "http://example.com/test_yang";
+    prefix test_yang;
+
+    import ietf-yang-schema-mount {
+        prefix yangmnt;
+    }
+    list device {
+        key name;
+
+        leaf name {
+            type string;
+        }
+        container services {
+            leaf bind {
+                type string;
+            }
+        }
+    }
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="sno"
+        xmlns="urn:ietf:params:xml:ns:yang:yin:1"
+        xmlns:sno="http://example.com/sno">
+  <namespace uri="http://example.com/sno"/>
+  <prefix value="sno"/>
+  <include module="device"/>
+  <container name="services"/>
+  <container name="resource-manager"/>
+</module>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="cumulus-nclu"
+        xmlns="urn:ietf:params:xml:ns:yang:yin:1"
+        xmlns:cumulus="http://example.com/cumulus-nclu">
+  <namespace uri="http://example.com/cumulus-nclu"/>
+  <prefix value="cumulus"/>
+  <revision date="2019-11-11">
+    <description>
+      <text>Initial revision</text>
+    </description>
+  </revision>
+  <container name="commands">
+    <leaf-list name="cmd">
+      <type name="string"/>
+    </leaf-list>
+  </container>
+</module>

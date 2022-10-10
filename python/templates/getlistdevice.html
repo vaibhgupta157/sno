@@ -141,7 +141,7 @@
               <tr>
                 <td width="10%">{{ device }}</td>
                 <td>{{ params.mgmt_ip }}</td>
-                <td><a href="#editDevice" class="nav-link" data-remote="/devices/device/{{device}}" data-toggle="modal" data-target="#editDevice"><button type="button" class="btn btn-info btn-sm" >Edit</button></a></td>
+                <td><a href="#editDevice{{device}}" class="nav-link" data-remote="/devices/device/{{device}}" data-toggle="modal" data-target="#editDevice{{device}}"><button type="button" class="btn btn-info btn-sm" >Edit</button></a></td>
                 <td><form action = "/devices/device/{{device}}" method="POST">
                   <input type="hidden" name="_method" value="DELETE">
                   <button type="submit" class="btn btn-info btn-sm">Delete</button>
@@ -204,8 +204,9 @@
     </div>
 
 
-
-    <div id="editDevice" class="modal fade" role="dialog">
+    {% for device, params in snoDB_dict.items() %}
+    {% if device != 'tree' %}
+    <div id="editDevice{{device}}" class="modal fade" role="dialog">
         <div class="modal-dialog modal-lg">
     
         <!-- Modal content-->
@@ -222,7 +223,8 @@
         </div>
         </div>
     </div>
-
+    {% endif %}
+    {% endfor %}
   
    </div>
   </body>

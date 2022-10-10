@@ -58,6 +58,21 @@
       
       </script>
 
+      <script>
+        $('#editModule').on('show.bs.modal', function(e) {
+            var button = $(e.relatedTarget);
+            var modal = $(this);
+            modal.find('.modal-content').load(button.data("remote"));
+        });
+        </script>
+      
+      <script>
+        function sendDelete(event){
+            event.preventDefault();
+            xhttp.open("DELETE", this.href, true);
+            xhttp.send();
+        }
+    </script>
 
 </head>
 <body>
@@ -71,19 +86,28 @@
                     
                         <form action ="/devices/device/{{ device_dict.name }}" method = "POST">
                             <div class="form-group">
-                          {% for param, value in device_dict.tree['sno:devices'][1].device[1].items() %}
-                            {% set device_param = device_dict[param] %}
-                            {% if value[0] == 'leaf' %}
-                              {% if value[1] == 'string' %}
+                          {% set device_details = namespace(device_dict=device_dict) %}
+                          {% for param, value in device_dict.tree.items() recursive %}
+                            {% set device_param = device_details.device_dict[param] %}
+                            {% if param == 'supported-modules' %}
+                              <ul>
+                              {% for item in device_param %}
+                                <li>
+                                <a href="#editModule" class="nav-link" data-remote="/devices/device/{{device_dict.name}}/{{item}}" data-toggle="modal" data-target="#editModule"><button type="button" class="btn btn-info btn-sm" >{{item}}</button></a>
+                                </li>
+                              {% endfor %}
+                              </ul>
+                            {% elif value.yang_type == 'leaf' %}
+                              {% if value.type == 'string' %}
                                 <label for={{param}}>{{param}}:</label>
                                 <input type="text" id={{param}} name={{param}} class="form-control" value={{device_param}}><br>
-                              {% elif value[1] == 'uint32' %}
+                              {% elif value.type == 'uint32' %}
                                 <label for={{param}}>{{param}}:</label>
                                 <input type="number" id={{param}} name={{param}} class="form-control" value={{device_param}}><br>
-                              {% elif value[1] == 'enumeration' %}
+                              {% elif value.type == 'enumeration' %}
                                 <label for={{param}}>{{param}}:</label>
                                 <select name={{param}} id={{param}} class="form-control">
-                                {% for enum in value[2] %}
+                                {% for enum in value.enum %}
                                   {% if enum == device_param %}
                                     <option value={{enum}} selected>{{enum}}</option>
                                   {% else %}
@@ -91,86 +115,35 @@
                                   {% endif %}
                                 {% endfor %}
                                 </select><br>
-                              {% elif value[1] is iterable %}
-                                {% if value[1][0] == 'union' %}
-                                  <label for={{param}}>{{param}}:</label>
-                                  <input type="text" id={{param}} name={{param}} class="form-control" value={{device_param}}><br>
-                                {% endif %}
+                              {% else %}
+                                <label for={{param}}>{{param}}:</label>
+                                <input type="text" id={{param}} name={{param}} class="form-control" value={{device_param}}><br>
                               {% endif %}
-        
-                            {% elif value[0] == 'container' %}
-                              {% set label_string_var = namespace(label_string=param) %}
-                              <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#{{param}}">{{param}}</button>
-                                <div id="{{param}}" class="collapse">
-                                {% set vars =  namespace(close_div=False) %}
-                                {% set device_param_var =  namespace(device_param=device_param) %}
-                                {% for recur_key, recur_value in value[1].items() recursive %}
-                                  {% if ':' in recur_key %}
-                                    {% set recur_key = recur_key.split(':')[1] %}
-                                  {% endif %}
-                                  {% if recur_key in device_param_var.device_param %}
-                                    {% set device_param_recur = device_param_var.device_param[recur_key] %}
-                                  {% else %}
-                                    {% set device_param_recur = "" %}
-                                  {% endif %}
-                                  {% set label_string_var.label_string = label_string_var.label_string + '.' + recur_key %}
-                                  {% if recur_value[0] == 'leaf' %}
-                                    {% if recur_value[1] == 'string' %}
-                                      <label for={{label_string}}>{{recur_key}}:</label>
-                                      <input type="text" id={{label_string}} name={{label_string}} class="form-control" value={{device_param_recur}}><br>
-                                    {% elif recur_value[1] == 'uint32' %}
-                                      <label for={{label_string}}>{{recur_key}}:</label>
-                                      <input type="number" id={{label_string}} name={{label_string}} class="form-control" value={{device_param_recur}}><br>
-                                    {% elif recur_value[1] == 'enumeration' %}
-                                      <label for={{label_string}}>{{recur_key}}:</label>
-                                      <select name={{label_string}} id={{label_string}} class="form-control">
-                                      {% for enum in recur_value[2] %}
-                                        {% if enum == device_param_recur %}
-                                          <option value={{enum}} selected>{{enum}}</option>
-                                        {% else %}
-                                          <option value={{enum}}>{{enum}}</option>
-                                        {% endif %}
-                                      {% endfor %}
-                                      </select><br>
-                                    {% elif recur_value[1] is iterable %}
-                                      {% if recur_value[1][0] == 'union' %}
-                                        <label for={{label_string}}>{{recur_key}}:</label>
-                                        <input type="text" id={{label_string}} name={{label_string}} class="form-control" value={{device_param_recur}}><br>
-                                      {% endif %}
-                                    {% endif %}
-                                  {% elif recur_value[0] == 'leaf-list' %}
-                                        <table id={{label_string_var.label_string}}>
-                                        {% for item in device_param_recur %}
-                                          {% set item_label = label_string_var.label_string + '[' + loop.index0|string + ']' %}
-                                          <tr>
-                                            <td>
-                                              <input type={{recur_value[1]}} id={{item_label}} name={{item_label}} class="form-control" value="{{item}}"">
-                                            </td>
-                                            <td>
-                                              {% set button_label = label_string_var.label_string + loop.index0|string %}
-                                              <input type="button" value="Delete" onclick="removeRow(this, '{{label_string_var.label_string}}', '{{label_string_var.label_string}}')">
-                                            </td>
-                                          </tr>
-                                        {% endfor %}
-                                        </table>
-                                        <input type="button" value="Add" onclick="addRow('{{label_string_var.label_string}}', '{{label_string_var.label_string}}')">
-        
-                                  {% elif recur_value[0] == 'container' %}
-                                    {% set device_param_var.device_param = device_param_recur %}
-                                      <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#{{param}}{{recur_key}}">{{recur_key}}</button>
-                                        <div id="{{param}}{{recur_key}}" class="collapse">
-                                          {% set vars.close_div = True %}
-                                          {{ loop (recur_value[1].items()) }}
-        
-                                  {% endif %}
-                                {% endfor %}
-                                {% if vars.close_div %}
-                                  </div>
-                                  {% set vars.close_div = False %}
-                                {% endif %}
-                                </div>
+                            
+                            {% elif value.yang_type == 'leaf-list' %}
+                              <table id={{param}}>
+                              {% for item in device_param %}
+                                {% set item_label = param + '[' + loop.index0|string + ']' %}
+                                <tr>
+                                  <td>
+                                    <input type={{value.type}} id={{item_label}} name={{item_label}} class="form-control" value="{{item}}"">
+                                  </td>
+                                  <td>
+                                    {% set button_label = param + loop.index0|string %}
+                                    <input type="button" value="Delete" onclick="removeRow(this, '{{param}}', '{{item_label}}')">
+                                  </td>
+                                </tr>
+                              {% endfor %}
+                              </table>
+                              <input type="button" value="Add" onclick="addRow('{{param}}', '{{item_label}}')">
+                            {% elif value.yang_type == 'container' %}
+                              <label for={{param}}>{{param}}:</label>
+                              {% set device_details.device_dict = device_param %}
+                              {{ loop(value.items())}}
                             {% endif %}
-                          {% endfor %}
+                          {% endfor %}  
+                      
+                          
                           <p><br>
                             <button type="submit" class="btn btn-info btn-sm">Edit</button></p>
                             </div>
@@ -181,6 +154,24 @@
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
               </div>
+          
+              <div id="editModule" class="modal fade" role="dialog">
+                <div class="modal-dialog modal-lg">
+            
+                <!-- Modal content-->
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h4 class="modal-title">Edit Module</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  </div>
+                  <div class="modal-body">
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  </div>
+                </div>
+                </div>
+            </div>
 
 </body>
 </html>

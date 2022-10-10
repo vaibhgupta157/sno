@@ -24,32 +24,33 @@ class ConfigDB:
             data = conf.read()
         
         snoDict = json.loads(data)
-        snoDB= sno()
-        pybindJSONDecoder.load_json(snoDict, None, None, snoDB)
-        ConfigDB.LOCKED = True
-        return {"ConfigDB" : snoDB}
+        #snoDB= sno()
+        #pybindJSONDecoder.load_json(snoDict, None, None, snoDB)
+        #ConfigDB.LOCKED = True
+        return {"ConfigDB" : snoDict}
 
     def release_lock():
         ConfigDB.LOCKED = False
         return
 
-    def write(snoRoot, sessionID):
-        snoRoot_dict = json.loads(pybindJSON.dumps(snoRoot))
+    def write(snoRoot_dict, sessionID):
+        #snoRoot_dict = json.loads(pybindJSON.dumps(snoRoot))
         with open("../ConfigDB", 'w') as conf:
             json.dump(snoRoot_dict, conf)
 
         with open("../ConfigDB") as conf:
             data = conf.read()
         snoDict = json.loads(data)
-        snoDB = sno()
-        pybindJSONDecoder.load_json(snoDict, None, None, snoDB)
+        #snoDB = sno()
+        #pybindJSONDecoder.load_json(snoDict, None, None, snoDB)
 
         for session in ConfigDB.active_sessions.keys():
-            session_dict = json.loads(pybindJSON.dumps(snoDB))
+            #session_dict = json.loads(pybindJSON.dumps(snoDB))
+            session_dict = ConfigDB.active_sessions[session]
             session_dict.update(snoDict)
-            session_snoDB = sno()
-            pybindJSONDecoder.load_json(session_dict, None, None, session_snoDB)
-            ConfigDB.active_sessions[session] = session_snoDB
+            #session_snoDB = sno()
+            #pybindJSONDecoder.load_json(session_dict, None, None, session_snoDB)
+            ConfigDB.active_sessions[session] = session_dict
         #ConfigDB.active_sessions[sessionID] = snoDB
 
         ConfigDB.LOCKED = False
@@ -62,7 +63,7 @@ class ConfigDB:
             data = conf.read()
         
         snoDict = json.loads(data)
-        snoDB= sno()
-        pybindJSONDecoder.load_json(snoDict, None, None, snoDB)
-        ConfigDB.active_sessions[sessionID] = snoDB
-        return snoDB
+        #snoDB= sno()
+        #pybindJSONDecoder.load_json(snoDict, None, None, snoDB)
+        ConfigDB.active_sessions[sessionID] = snoDict
+        return snoDict

@@ -183,7 +183,8 @@ tr:nth-child(even) {
             <tr>
               <td width="10%">{{ device }}</td>
               <td>{{ params.mgmt_ip }}</td>
-              <td><button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#editDevice{{ device }}">Edit</button></td>
+              {% set modalname = "editDevice" ~ device %}
+              <td><button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="{{modalname}}">Edit</button></td>
             </tr>
             {% endfor %}
           </tbody>

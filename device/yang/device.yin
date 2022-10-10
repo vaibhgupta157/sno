@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<submodule name="device"
+           xmlns="urn:ietf:params:xml:ns:yang:yin:1"
+           xmlns:yangmnt="urn:ietf:params:xml:ns:yang:ietf-yang-schema-mount"
+           xmlns:inet="urn:ietf:params:xml:ns:yang:ietf-inet-types">
+  <yang-version value="1.1"/>
+  <belongs-to module="sno">
+    <prefix value="sno"/>
+  </belongs-to>
+  <import module="ietf-yang-schema-mount">
+    <prefix value="yangmnt"/>
+  </import>
+  <import module="ietf-inet-types">
+    <prefix value="inet"/>
+  </import>
+  <container name="devices">
+    <list name="device">
+      <key value="name"/>
+      <leaf name="name">
+        <type name="string"/>
+      </leaf>
+      <leaf name="device_type">
+        <type name="enumeration">
+          <enum name="CumulusLinux"/>
+          <enum name="odl"/>
+        </type>
+      </leaf>
+      <leaf name="mgmt_ip">
+        <mandatory value="true"/>
+        <type name="inet:ip-address"/>
+      </leaf>
+      <leaf name="netconf_port">
+        <type name="uint32"/>
+        <default value="830"/>
+      </leaf>
+      <leaf name="netconf_user">
+        <type name="string"/>
+        <default value="admin"/>
+      </leaf>
+      <leaf name="netconf_password">
+        <type name="string"/>
+        <default value="CumulusLinux!"/>
+      </leaf>
+      <container name="config">
+        <list name="supported-modules">
+          <key value="name"/>
+          <leaf name="name">
+            <type name="string"/>
+          </leaf>
+        </list>
+      </container>
+    </list>
+    <list name="groups">
+      <key value="name"/>
+      <leaf name="name">
+        <type name="string"/>
+      </leaf>
+      <leaf-list name="device">
+        <type name="leafref">
+          <path value="../../device/name"/>
+        </type>
+      </leaf-list>
+    </list>
+  </container>
+</submodule>
